@@ -12,19 +12,19 @@ let campgrounds = [
     {name: "Mountain Goat's Rest", image: 'https://pixabay.com/get/e834b5062cf4033ed1584d05fb1d4e97e07ee3d21cac104496f8c97aa4e5bdb9_340.jpg'},
 ]
 
-app.get('/', function(req, res) {
+app.get('/', (req, res) => {
     res.render('landing');
 });
 
-app.get('/campgrounds', function(req, res) {
+app.get('/campgrounds', (req, res) => {
     res.render('campgrounds', {campgrounds: campgrounds});
 });
 
-app.get('/campgrounds/new', function(req, res) {
+app.get('/campgrounds/new', (req, res) => {
     res.render('new.ejs');
 });
 
-app.post('/campgrounds', function(req, res) {
+app.post('/campgrounds', (req, res) => {
     let name = req.body.name;
     let image = req.body.image;
     campgrounds.push({name: name, image: image});
