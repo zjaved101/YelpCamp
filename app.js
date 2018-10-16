@@ -14,7 +14,8 @@ mongoose.connect(uri);
 // SCHEMA SETUP
 let campgroundSchema = new mongoose.Schema({
     name: String,
-    image: String
+    image: String,
+    description: String
 });
 
 let Campground = mongoose.model("Campground", campgroundSchema);
@@ -22,7 +23,8 @@ let Campground = mongoose.model("Campground", campgroundSchema);
 // Campground.create(
 //     {
 //         name: 'Granite Hill', 
-//         image: 'https://cdn.pixabay.com/photo/2015/11/07/11/39/camping-1031360_1280.jpg'
+//         image: 'https://cdn.pixabay.com/photo/2015/11/07/11/39/camping-1031360_1280.jpg',
+//         description: "This is a huge granite hill, no bathrooms. No water. Beautiful granite!"
 
 //     }, (err, campground) => {
 //         if(err)
@@ -49,7 +51,7 @@ app.get('/campgrounds', (req, res) => {
         if(err)
             console.log(err);
         else {
-            res.render('campgrounds', {campgrounds: allCampgrounds});
+            res.render('index', {campgrounds: allCampgrounds});
         }
     });
 });
@@ -58,10 +60,24 @@ app.get('/campgrounds/new', (req, res) => {
     res.render('new.ejs');
 });
 
+//SHOW - shows more info about one campground
+app.get('/campgrounds/:id', (req,res) => {
+    Campground.findById(req.params.id, (err, foundCampground) => {
+        if(err)
+            console.log(err);
+        else {
+            res.render('show', {campground: foundCampground});
+        }
+    });
+
+    
+});
+
+//CREATE - add new campground to DB
 app.post('/campgrounds', (req, res) => {
     //let name = req.body.name;
     //let image = req.body.image;
-    let newCampground = {name: req.body.name, image: req.body.image};
+    let newCampground = {name: req.body.name, image: req.body.image, description: req.body.description};
     //campgrounds.push({name: name, image: image});
     Campground.create(newCampground, (err, newlyCreated) => {
         if(err)
