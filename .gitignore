@@ -1,2 +1,5 @@
 node_modules
 test
+.env
+readKey.js
+key.txt

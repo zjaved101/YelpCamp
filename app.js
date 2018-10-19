@@ -1,36 +1,71 @@
 const express = require('express');
 const app = express();
+require('dotenv').config()
 const bodyParser = require('body-parser');
-const port = 3000;
+const mongoose = require('mongoose');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
+mongoose.connect(process.env.DB_URI);
 
-let campgrounds = [
-    {name: 'Salmon Creek', image: 'https://pixabay.com/get/e83db40e28fd033ed1584d05fb1d4e97e07ee3d21cac104496f8c97aa4e5bdb9_340.jpg'},
-    {name: 'Granite Hill', image: 'https://pixabay.com/get/e837b1072af4003ed1584d05fb1d4e97e07ee3d21cac104496f8c97aa4e5bdb9_340.jpg'},
-    {name: "Mountain Goat's Rest", image: 'https://pixabay.com/get/e834b5062cf4033ed1584d05fb1d4e97e07ee3d21cac104496f8c97aa4e5bdb9_340.jpg'},
-]
+// SCHEMA SETUP
+let campgroundSchema = new mongoose.Schema({
+    name: String,
+    image: String,
+    description: String
+});
+
+let Campground = mongoose.model("Campground", campgroundSchema);
 
 app.get('/', (req, res) => {
     res.render('landing');
 });
 
 app.get('/campgrounds', (req, res) => {
-    res.render('campgrounds', {campgrounds: campgrounds});
+    // res.render('campgrounds', {campgrounds: campgrounds});
+    Campground.find({}, (err, allCampgrounds) => {
+        if(err)
+            console.log(err);
+        else {
+            res.render('index', {campgrounds: allCampgrounds});
+        }
+    });
 });
 
 app.get('/campgrounds/new', (req, res) => {
     res.render('new.ejs');
 });
 
-app.post('/campgrounds', (req, res) => {
-    let name = req.body.name;
-    let image = req.body.image;
-    campgrounds.push({name: name, image: image});
-    res.redirect('/campgrounds');
+//SHOW - shows more info about one campground
+app.get('/campgrounds/:id', (req,res) => {
+    Campground.findById(req.params.id, (err, foundCampground) => {
+        if(err)
+            console.log(err);
+        else {
+            res.render('show', {campground: foundCampground});
+        }
+    });
+
+    
 });
 
-app.listen(port, () => {
+//CREATE - add new campground to DB
+app.post('/campgrounds', (req, res) => {
+    //let name = req.body.name;
+    //let image = req.body.image;
+    let newCampground = {name: req.body.name, image: req.body.image, description: req.body.description};
+    //campgrounds.push({name: name, image: image});
+    Campground.create(newCampground, (err, newlyCreated) => {
+        if(err)
+            console.log(err)
+        else {
+            res.redirect('/campgrounds');
+        }
+    });
+
+    //res.redirect('/campgrounds');
+});
+
+app.listen(process.env.PORT, () => {
     console.log('YelpCamp Server has started');
 });
