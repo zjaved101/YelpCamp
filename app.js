@@ -1,15 +1,12 @@
 const express = require('express');
 const app = express();
+require('dotenv').config()
 const bodyParser = require('body-parser');
-const port = 3000;
-const key = require('./readKey');
-const dbKey = key.getKey();
 const mongoose = require('mongoose');
-const uri = 'mongodb+srv://zanj:'+dbKey+'@cluster0-5byxh.gcp.mongodb.net/yelp_camp?retryWrites=true';
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
-mongoose.connect(uri);
+mongoose.connect(process.env.DB_URI);
 
 // SCHEMA SETUP
 let campgroundSchema = new mongoose.Schema({
@@ -90,6 +87,6 @@ app.post('/campgrounds', (req, res) => {
     //res.redirect('/campgrounds');
 });
 
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
     console.log('YelpCamp Server has started');
 });
